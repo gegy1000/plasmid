@@ -7,7 +7,7 @@ import net.gegy1000.plasmid.game.event.EventType;
 import net.gegy1000.plasmid.game.event.GameCloseListener;
 import net.gegy1000.plasmid.game.event.GameOpenListener;
 import net.gegy1000.plasmid.game.event.GameTickListener;
-import net.gegy1000.plasmid.game.event.OfferPlayerListener;
+import net.gegy1000.plasmid.game.event.OfferPlayersListener;
 import net.gegy1000.plasmid.game.event.PlayerAddListener;
 import net.gegy1000.plasmid.game.event.PlayerRemoveListener;
 import net.gegy1000.plasmid.game.event.RequestStartListener;
@@ -23,6 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -75,17 +76,21 @@ public final class Game {
         return this.invoker(RequestStartListener.EVENT).requestStart(this);
     }
 
-    public JoinResult offerPlayer(ServerPlayerEntity player) {
-        JoinResult result = this.invoker(OfferPlayerListener.EVENT).offerPlayer(this, player);
+    // TODO: offer a collection of player references
+    public JoinResult offerPlayers(Collection<ServerPlayerEntity> players) {
+        JoinResult result = this.invoker(OfferPlayersListener.EVENT).offerPlayers(this, players);
         if (result.isErr()) {
             return result;
         }
 
-        if (this.addPlayer(player)) {
-            return JoinResult.ok();
-        } else {
-            return JoinResult.alreadyJoined();
+        boolean ok = false;
+        for (ServerPlayerEntity player : players) {
+            if (this.addPlayer(player)) {
+                ok = true;
+            }
         }
+
+        return ok ? JoinResult.ok() : JoinResult.alreadyJoined();
     }
 
     public boolean addPlayer(ServerPlayerEntity player) {

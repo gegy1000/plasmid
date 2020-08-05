@@ -7,8 +7,10 @@ import net.minecraft.text.Text;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public final class Party {
     private PlayerRef owner;
@@ -55,13 +57,17 @@ public final class Party {
         return this.members;
     }
 
+    public Stream<ServerPlayerEntity> onlinePlayers(MinecraftServer server) {
+        return this.members.stream()
+                .map(ref -> ref.getEntity(server))
+                .filter(Objects::nonNull);
+    }
+
     public void broadcastMessage(MinecraftServer server, Text message) {
         this.forOnline(server, player -> player.sendMessage(message, false));
     }
 
     public void forOnline(MinecraftServer server, Consumer<ServerPlayerEntity> consumer) {
-        for (PlayerRef member : this.members) {
-            member.ifOnline(server, consumer);
-        }
+        this.onlinePlayers(server).forEach(consumer);
     }
 }

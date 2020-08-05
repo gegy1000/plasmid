@@ -13,6 +13,9 @@ import net.gegy1000.plasmid.game.GameManager;
 import net.gegy1000.plasmid.game.JoinResult;
 import net.gegy1000.plasmid.game.StartResult;
 import net.gegy1000.plasmid.game.config.GameConfigs;
+import net.gegy1000.plasmid.party.Party;
+import net.gegy1000.plasmid.party.PartyManager;
+import net.gegy1000.plasmid.util.PlayerRef;
 import net.minecraft.command.arguments.IdentifierArgumentType;
 import net.minecraft.network.MessageType;
 import net.minecraft.server.MinecraftServer;
@@ -30,6 +33,10 @@ import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -104,13 +111,16 @@ public final class GameCommand {
                 .setHoverEvent(joinHover);
 
         Text openMessage = new LiteralText("Game has opened! ")
+                .formatted(Formatting.GRAY)
                 .append(new LiteralText("Click here to join").setStyle(joinStyle));
         playerManager.broadcastChatMessage(openMessage, MessageType.SYSTEM, Util.NIL_UUID);
     }
 
     private static void onOpenError(PlayerManager playerManager, Throwable throwable) {
         Plasmid.LOGGER.error("Failed to start game", throwable);
-        playerManager.broadcastChatMessage(new LiteralText("An exception occurred while trying to start game"), MessageType.SYSTEM, Util.NIL_UUID);
+
+        Text message = new LiteralText("An exception occurred while trying to start game").formatted(Formatting.RED);
+        playerManager.broadcastChatMessage(message, MessageType.SYSTEM, Util.NIL_UUID);
     }
 
     private static int joinGame(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -123,16 +133,28 @@ public final class GameCommand {
             throw NOT_RECRUITING.create();
         }
 
-        JoinResult joinResult = open.offerPlayer(player);
+        Collection<ServerPlayerEntity> players = Collections.singleton(player);
+
+        Party party = PartyManager.INSTANCE.getOwnParty(PlayerRef.of(player));
+        if (party != null) {
+            players = party.onlinePlayers(source.getMinecraftServer())
+                    .collect(Collectors.toList());
+        }
+
+        JoinResult joinResult = open.offerPlayers(players);
         if (joinResult.isErr()) {
             Text error = joinResult.getError();
             throw new SimpleCommandExceptionType(error).create();
         }
 
-        Text joinMessage = player.getDisplayName().shallowCopy()
-                .append(" has joined the game lobby!")
-                .setStyle(Style.EMPTY.withColor(Formatting.YELLOW));
-        playerManager.broadcastChatMessage(joinMessage, MessageType.SYSTEM, Util.NIL_UUID);
+        for (ServerPlayerEntity member : players) {
+            Text joinMessage = member.getDisplayName().shallowCopy()
+                    .append(" has joined the game lobby!")
+                    .setStyle(Style.EMPTY.withColor(Formatting.YELLOW));
+
+            // TODO: broadcast to game only
+            playerManager.broadcastChatMessage(joinMessage, MessageType.SYSTEM, Util.NIL_UUID);
+        }
 
         return Command.SINGLE_SUCCESS;
     }
@@ -153,7 +175,8 @@ public final class GameCommand {
 
         MinecraftServer server = source.getMinecraftServer();
         PlayerManager playerManager = server.getPlayerManager();
-        playerManager.broadcastChatMessage(new LiteralText("Game is starting!"), MessageType.SYSTEM, Util.NIL_UUID);
+        Text message = new LiteralText("Game is starting!").formatted(Formatting.GRAY);
+        playerManager.broadcastChatMessage(message, MessageType.SYSTEM, Util.NIL_UUID);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -168,7 +191,7 @@ public final class GameCommand {
 
         MinecraftServer server = context.getSource().getMinecraftServer();
 
-        LiteralText message = new LiteralText("Game has been stopped");
+        Text message = new LiteralText("Game has been stopped").formatted(Formatting.GRAY);
         server.getPlayerManager().broadcastChatMessage(message, MessageType.SYSTEM, Util.NIL_UUID);
 
         return Command.SINGLE_SUCCESS;

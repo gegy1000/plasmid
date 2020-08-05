@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -90,8 +91,8 @@ public final class GameManager {
             this.game = game;
         }
 
-        public JoinResult offerPlayer(ServerPlayerEntity player) {
-            return this.game.offerPlayer(player);
+        public JoinResult offerPlayers(Collection<ServerPlayerEntity> players) {
+            return this.game.offerPlayers(players);
         }
 
         public StartResult requestStart() {

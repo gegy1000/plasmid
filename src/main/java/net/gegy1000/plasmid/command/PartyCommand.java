@@ -188,7 +188,21 @@ public final class PartyCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int leave(CommandContext<ServerCommandSource> ctx) {
+    private static int leave(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        ServerCommandSource source = ctx.getSource();
+        ServerPlayerEntity player = source.getPlayer();
+
+        PartyResult result = PartyManager.INSTANCE.leaveParty(PlayerRef.of(player));
+        if (result.isOk()) {
+            Party party = result.getParty();
+
+            MutableText message = player.getDisplayName().shallowCopy().append(" has left the party!");
+            party.broadcastMessage(source.getMinecraftServer(), message.formatted(Formatting.GOLD));
+        } else {
+            PartyError error = result.getError();
+            source.sendError(displayError(error, player));
+        }
+
         return Command.SINGLE_SUCCESS;
     }
 
