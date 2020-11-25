@@ -12,4 +12,5 @@ public final class GameRule {
     public static final GameRule THROW_ITEMS = new GameRule();
     public static final GameRule UNSTABLE_TNT = new GameRule();
     public static final GameRule TEAM_CHAT = new GameRule();
+    public static final GameRule SANITIZE_CREATIVE_ACTIONS = new GameRule();
 }

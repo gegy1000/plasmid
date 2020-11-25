@@ -29,6 +29,7 @@
     "game.event.ScreenHandlerMixin",
     "game.rule.ServerPlayerEntityMixin",
     "game.rule.ServerPlayerInteractionManagerMixin",
+    "game.rule.ServerPlayNetworkHandlerMixin",
     "game.rule.TntBlockMixin",
     "storage.ServerWorldMixin"
   ],
