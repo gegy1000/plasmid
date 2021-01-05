@@ -24,6 +24,7 @@ import net.minecraft.util.Util;
 import xyz.nucleoid.plasmid.Plasmid;
 import xyz.nucleoid.plasmid.command.argument.GameChannelArgument;
 import xyz.nucleoid.plasmid.command.argument.GameConfigArgument;
+import xyz.nucleoid.plasmid.error.ErrorReporter;
 import xyz.nucleoid.plasmid.game.ConfiguredGame;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameOpenException;
@@ -139,12 +140,13 @@ public final class GameCommand {
                         }
                         onOpenSuccess(source, channel, game, playerManager);
                     } else {
-                        onOpenError(playerManager, throwable);
+
+                        onOpenError(playerManager, throwable, game);
                     }
                     return null;
                 }, server);
             } catch (Throwable throwable) {
-                onOpenError(playerManager, throwable);
+                onOpenError(playerManager, throwable, game);
             }
         });
 
@@ -158,8 +160,9 @@ public final class GameCommand {
         playerManager.broadcastChatMessage(openMessage, MessageType.SYSTEM, Util.NIL_UUID);
     }
 
-    private static void onOpenError(PlayerManager playerManager, Throwable throwable) {
+    private static void onOpenError(PlayerManager playerManager, Throwable throwable, ConfiguredGame<?> game) {
         Plasmid.LOGGER.error("Failed to start game", throwable);
+        ErrorReporter.open(game.getName() + " (" + game.getType().getIdentifier() + ")").report(throwable, "Starting game");
 
         MutableText message;
         if (throwable instanceof GameOpenException) {
