@@ -16,6 +16,7 @@
     "fabricloader": ">=0.9.1",
     "fabric": "*",
     "minecraft": "1.16.x",
+    "fabric-permissions-api-v0": "*",
     "leukocyte": "0.1.x"
   }
 }

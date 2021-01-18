@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.*;
 import net.minecraft.entity.EntityType;
@@ -71,7 +72,7 @@ public final class MapMetadataCommand {
     // @formatter:off
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
-            literal("map").requires(source -> source.hasPermissionLevel(4))
+            literal("map").requires(Permissions.require("plasmid.command.map", 4))
                 .then(literal("region")
                     .then(literal("add")
                         .then(argument("marker", StringArgumentType.word())

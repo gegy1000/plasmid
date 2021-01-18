@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.command.argument.NbtCompoundTagArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.CompoundTag;
@@ -48,17 +49,17 @@ public final class GameCommand {
             new LiteralText("No game is open in this world!")
     );
 
-    public static final DynamicCommandExceptionType MALFORMED_CONFIG = new DynamicCommandExceptionType(error -> {
-        return new TranslatableText("Malformed config: %s", error);
-    });
+    public static final DynamicCommandExceptionType MALFORMED_CONFIG = new DynamicCommandExceptionType(error ->
+            new TranslatableText("Malformed config: %s", error)
+    );
 
     // @formatter:off
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
             literal("game")
                 .then(literal("open")
-                    .requires(source -> source.hasPermissionLevel(2))
-                    .then(GameConfigArgument.argument("game_config")
+                        .requires(Permissions.require("plasmid.command.game.open", 2))
+                        .then(GameConfigArgument.argument("game_config")
                         .executes(GameCommand::openGame)
                     )
                     .then(argument("game_config_nbt", NbtCompoundTagArgumentType.nbtCompound())
@@ -66,19 +67,19 @@ public final class GameCommand {
                     )
                 )
                 .then(literal("propose")
-                    .requires(source -> source.hasPermissionLevel(2))
+                    .requires(Permissions.require("plasmid.command.game.propose", 2))
                     .then(GameChannelArgument.argument("game_channel")
                     .executes(GameCommand::proposeGame)
                 ))
                 .then(literal("start")
-                    .requires(source -> source.hasPermissionLevel(2))
+                    .requires(Permissions.require("plasmid.command.game.start",2))
                     .executes(GameCommand::startGame)
                 )
                 .then(literal("stop")
-                    .requires(source -> source.hasPermissionLevel(2))
+                        .requires(Permissions.require("plasmid.command.game.stop", 2))
                     .executes(GameCommand::stopGame)
                         .then(literal("confirm")
-                            .requires(source -> source.hasPermissionLevel(2))
+                            .requires(Permissions.require("plasmid.command.game.stop", 2))
                             .executes(GameCommand::stopGameConfirmed)
                         )
                 )
@@ -89,7 +90,7 @@ public final class GameCommand {
                     )
                 )
                 .then(literal("joinall")
-                    .requires(source -> source.hasPermissionLevel(2))
+                        .requires(Permissions.require("plasmid.command.game.joinall", 2))
                     .executes(GameCommand::joinAllGame)
                     .then(GameConfigArgument.argument("game_config")
                         .executes(GameCommand::joinAllQualifiedGame)

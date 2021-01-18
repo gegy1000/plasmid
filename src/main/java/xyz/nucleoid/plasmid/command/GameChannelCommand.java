@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
@@ -37,7 +38,7 @@ public final class GameChannelCommand {
         dispatcher.register(
             literal("game")
                 .then(literal("channel")
-                    .requires(source -> source.hasPermissionLevel(3))
+                    .requires(Permissions.require("plasmid.command.game_channel", 3))
                     .then(literal("connect")
                         .then(GameChannelArgument.argument("channel")
                         .then(argument("entity", EntityArgumentType.entity()).executes(GameChannelCommand::connectEntityToChannel))
