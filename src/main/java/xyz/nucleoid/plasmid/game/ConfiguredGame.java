@@ -1,9 +1,7 @@
 package xyz.nucleoid.plasmid.game;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
-import com.mojang.serialization.codecs.UnboundedMapCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -12,9 +10,8 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.error.ErrorReporter;
+import xyz.nucleoid.plasmid.game.config.CustomValuesConfig;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -31,7 +28,7 @@ public final class ConfiguredGame<C> {
     @Nullable
     private final String translation;
 
-    private final Map<Identifier, Dynamic<?>> custom;
+    private final CustomValuesConfig custom;
 
     private final C config;
 
@@ -40,7 +37,7 @@ public final class ConfiguredGame<C> {
             GameType<C> type,
             @Nullable String name,
             @Nullable String translation,
-            Map<Identifier, Dynamic<?>> custom,
+            CustomValuesConfig custom,
             C config
     ) {
         this.source = source;
@@ -101,13 +98,8 @@ public final class ConfiguredGame<C> {
         }
     }
 
-    public <T> Optional<T> getCustomValue(Codec<T> codec, Identifier key) {
-        Dynamic<?> value = this.custom.get(key);
-        if (value != null) {
-            return codec.decode(value).result().map(Pair::getFirst);
-        } else {
-            return Optional.empty();
-        }
+    public CustomValuesConfig getCustom() {
+        return this.custom;
     }
 
     public C getConfig() {
@@ -115,8 +107,6 @@ public final class ConfiguredGame<C> {
     }
 
     static final class ConfigCodec extends MapCodec<ConfiguredGame<?>> {
-        private static final UnboundedMapCodec<Identifier, Dynamic<?>> CUSTOM_VALUES_CODEC = Codec.unboundedMap(Identifier.CODEC, Codec.PASSTHROUGH);
-
         private final Identifier source;
 
         ConfigCodec(Identifier source) {
@@ -140,7 +130,7 @@ public final class ConfiguredGame<C> {
             return typeResult.flatMap(type -> {
                 String name = this.decodeStringOrNull(ops, input.get("name"));
                 String translation = this.decodeStringOrNull(ops, input.get("translation"));
-                Map<Identifier, Dynamic<?>> custom = this.decodeCustomValues(ops, input.get("custom"));
+                CustomValuesConfig custom = this.decodeCustomValues(ops, input.get("custom"));
 
                 Codec<?> configCodec = type.getConfigCodec();
                 return this.decodeConfig(ops, input, configCodec).map(config -> {
@@ -155,10 +145,10 @@ public final class ConfiguredGame<C> {
                     .orElse(null);
         }
 
-        private <T> Map<Identifier, Dynamic<?>> decodeCustomValues(DynamicOps<T> ops, T input) {
-            return CUSTOM_VALUES_CODEC.decode(ops, input)
+        private <T> CustomValuesConfig decodeCustomValues(DynamicOps<T> ops, T input) {
+            return CustomValuesConfig.CODEC.decode(ops, input)
                     .result().map(Pair::getFirst)
-                    .orElse(ImmutableMap.of());
+                    .orElse(CustomValuesConfig.empty());
         }
 
         private <T> DataResult<?> decodeConfig(DynamicOps<T> ops, MapLike<T> input, Codec<?> configCodec) {
@@ -170,7 +160,7 @@ public final class ConfiguredGame<C> {
         }
 
         @SuppressWarnings("unchecked")
-        private <C> ConfiguredGame<C> createConfigUnchecked(GameType<C> type, String name, String translation, Map<Identifier, Dynamic<?>> custom, Object config) {
+        private <C> ConfiguredGame<C> createConfigUnchecked(GameType<C> type, String name, String translation, CustomValuesConfig custom, Object config) {
             return new ConfiguredGame<>(this.source, type, name, translation, custom, (C) config);
         }
 
@@ -198,7 +188,7 @@ public final class ConfiguredGame<C> {
             }
 
             if (!game.custom.isEmpty()) {
-                prefix.add("custom", CUSTOM_VALUES_CODEC.encodeStart(ops, game.custom));
+                prefix.add("custom", CustomValuesConfig.CODEC.encodeStart(ops, game.custom));
             }
 
             return prefix;

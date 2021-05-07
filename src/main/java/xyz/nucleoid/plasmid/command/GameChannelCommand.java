@@ -61,7 +61,7 @@ public final class GameChannelCommand {
                 throw INTERFACE_ALREADY_CONNECTED.create();
             }
 
-            MutableText message = new TranslatableText("text.plasmid.game.channel.connect.entity", channel.getId(), entity.getEntityName());
+            MutableText message = new TranslatableText("text.plasmid.game.channel.connect.entity", channel.getName(), entity.getEntityName());
             context.getSource().sendFeedback(message.formatted(Formatting.GRAY), false);
 
             return Command.SINGLE_SUCCESS;
@@ -83,7 +83,7 @@ public final class GameChannelCommand {
                 throw INTERFACE_ALREADY_CONNECTED.create();
             }
 
-            MutableText message = new TranslatableText("text.plasmid.game.channel.connect.block", channel.getId(), pos.getX(), pos.getY(), pos.getZ());
+            MutableText message = new TranslatableText("text.plasmid.game.channel.connect.block", channel.getName(), pos.getX(), pos.getY(), pos.getZ());
             source.sendFeedback(message.formatted(Formatting.GRAY), false);
 
             return Command.SINGLE_SUCCESS;

@@ -272,7 +272,7 @@ public final class ManagedGameSpace implements GameSpace {
 
     @Override
     public CompletableFuture<StartResult> requestStart() {
-        return Scheduler.INSTANCE.submit(server -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 StartResult startResult = this.invoker(RequestStartListener.EVENT).requestStart();
                 return GameEvents.START_REQUEST.invoker().onRequestStart(this, startResult);
@@ -282,7 +282,7 @@ public final class ManagedGameSpace implements GameSpace {
 
                 return StartResult.error(new TranslatableText("text.plasmid.game.start_result.error"));
             }
-        });
+        }, this.getServer());
     }
 
     /**
@@ -295,7 +295,7 @@ public final class ManagedGameSpace implements GameSpace {
      * @return {@link JoinResult} describing the results of the given {@link ServerPlayerEntity} trying to join
      */
     public CompletableFuture<JoinResult> offerPlayer(ServerPlayerEntity player) {
-        return Scheduler.INSTANCE.submit(server -> {
+        return CompletableFuture.supplyAsync(() -> {
             if (ManagedGameSpace.forWorld(player.world) != null) {
                 return JoinResult.inOtherGame();
             }
@@ -325,7 +325,7 @@ public final class ManagedGameSpace implements GameSpace {
             } else {
                 return JoinResult.alreadyJoined();
             }
-        });
+        }, this.getServer());
     }
 
     /**

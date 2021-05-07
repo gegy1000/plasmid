@@ -1,5 +1,5 @@
 plugins {
-  id 'fabric-loom' version '0.5-SNAPSHOT'
+  id 'fabric-loom' version '0.6-SNAPSHOT'
   id 'maven-publish'
 }
 
@@ -41,14 +41,13 @@ dependencies {
     exclude module: "fabric-loader"
   }
 
-  modImplementation 'fr.catcore:server-translations-api:1.4.1'
-  include 'fr.catcore:server-translations-api:1.4.1'
+  modImplementation include('fr.catcore:server-translations-api:1.4.1')
 
-  modImplementation 'xyz.nucleoid:packet-tweaker:0.1.2'
-  include 'xyz.nucleoid:packet-tweaker:0.1.2'
+  modImplementation include('xyz.nucleoid:packet-tweaker:0.1.2')
 
-  modImplementation 'xyz.nucleoid:fantasy:0.2.6'
-  include 'xyz.nucleoid:fantasy:0.2.6'
+  modImplementation include('xyz.nucleoid:fantasy:0.2.8')
+
+  modImplementation include('xyz.nucleoid:more-codecs:0.1.0')
 
   modImplementation 'xyz.nucleoid:leukocyte:0.1.3'
 }

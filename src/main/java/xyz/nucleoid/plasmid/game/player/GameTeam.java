@@ -6,22 +6,17 @@ import net.minecraft.item.FireworkItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.MathHelper;
+import xyz.nucleoid.codecs.MoreCodecs;
 import xyz.nucleoid.plasmid.util.ItemStackBuilder;
 import xyz.nucleoid.plasmid.util.ItemUtil;
 
 public final class GameTeam {
-    private static final Codec<DyeColor> COLOR_CODEC = StringIdentifiable.createCodec(
-            DyeColor::values,
-            key -> DyeColor.byName(key, DyeColor.WHITE)
-    );
-
     public static final Codec<GameTeam> CODEC = RecordCodecBuilder.create(instance -> {
         return instance.group(
                 Codec.STRING.fieldOf("key").forGetter(GameTeam::getKey),
                 Codec.STRING.fieldOf("display").forGetter(GameTeam::getDisplay),
-                COLOR_CODEC.fieldOf("color").forGetter(GameTeam::getDye)
+                MoreCodecs.DYE_COLOR.fieldOf("color").forGetter(GameTeam::getDye)
         ).apply(instance, GameTeam::new);
     });
 

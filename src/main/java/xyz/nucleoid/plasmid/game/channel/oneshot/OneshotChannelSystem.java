@@ -39,7 +39,7 @@ public final class OneshotChannelSystem implements GameChannelSystem {
     }
 
     private GameChannel createChannel(ManagedGameSpace gameSpace) {
-        Identifier id = this.createChannelIdFor(gameSpace.getGameConfig().getType().getIdentifier());
+        Identifier id = this.createChannelIdFor(gameSpace.getGameConfig().getType());
 
         gameSpace.getLifecycle().addListeners(new GameLifecycle.Listeners() {
             @Override
@@ -48,10 +48,11 @@ public final class OneshotChannelSystem implements GameChannelSystem {
             }
         });
 
-        return new GameChannel(this.server, id, members -> new OneshotChannelBackend(gameSpace, members));
+        return new GameChannel(this.server, id, (server, channelId, members) -> new OneshotChannelBackend(gameSpace, members));
     }
 
-    private Identifier createChannelIdFor(Identifier gameId) {
+    private Identifier createChannelIdFor(GameType<?> gameType) {
+        Identifier gameId = gameType.getIdentifier();
         return new Identifier(gameId.getNamespace(), gameId.getPath() + "_" + RandomStringUtils.random(6, ALPHABET));
     }
 

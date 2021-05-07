@@ -78,7 +78,11 @@ public final class ConfiguredChannelSystem implements GameChannelSystem {
         for (Map.Entry<Identifier, GameChannelConfig> entry : queue.entrySet()) {
             Identifier identifier = entry.getKey();
             GameChannelConfig config = entry.getValue();
-            this.channels.register(identifier, new GameChannel(server, identifier, config::createBackend));
+
+            GameChannel channel = new GameChannel(server, identifier, config::createBackend);
+            channel.setCustom(config.getCustom());
+
+            this.channels.register(identifier, channel);
         }
     }
 
