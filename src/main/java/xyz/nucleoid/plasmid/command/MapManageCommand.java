@@ -165,8 +165,8 @@ public final class MapManageCommand {
             if (throwable == null) {
                 source.sendFeedback(
                         new TranslatableText("text.plasmid.map.open.success",
-							identifier,
-							new TranslatableText("text.plasmid.map.open.join_command", identifier).formatted(Formatting.GRAY)),
+                            identifier,
+                            new TranslatableText("text.plasmid.map.open.join_command", identifier).formatted(Formatting.GRAY)),
                         false
                 );
             } else {
@@ -263,8 +263,8 @@ public final class MapManageCommand {
 
         source.sendFeedback(
                 new TranslatableText("text.plasmid.map.join.success",
-					workspace.getIdentifier(),
-					new TranslatableText("text.plasmid.map.join.leave_command").formatted(Formatting.GRAY)),
+                    workspace.getIdentifier(),
+                    new TranslatableText("text.plasmid.map.join.leave_command").formatted(Formatting.GRAY)),
                 false
         );
 
@@ -310,8 +310,8 @@ public final class MapManageCommand {
         if (bounds.getMin().getY() < 0 || bounds.getMax().getY() > 255) {
             source.sendFeedback(
                     new TranslatableText("text.plasmid.map.export.vertical_bounds_warning.line.1").append("\n")
-                    		.append(new TranslatableText("text.plasmid.map.export.vertical_bounds_warning.line.2")).append("\n")
-                       		.append(new TranslatableText("text.plasmid.map.export.vertical_bounds_warning.line.3"))
+                            .append(new TranslatableText("text.plasmid.map.export.vertical_bounds_warning.line.2")).append("\n")
+                            .append(new TranslatableText("text.plasmid.map.export.vertical_bounds_warning.line.3"))
                             .formatted(Formatting.YELLOW),
                     false
             );

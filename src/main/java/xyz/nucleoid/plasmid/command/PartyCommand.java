@@ -150,7 +150,7 @@ public final class PartyCommand {
             );
 
             player.sendMessage(
-					new TranslatableText("text.plasmid.party.transferred.receiver", owner.getDisplayName())
+                    new TranslatableText("text.plasmid.party.transferred.receiver", owner.getDisplayName())
                             .formatted(Formatting.GOLD),
                     false
             );
