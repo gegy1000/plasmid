@@ -89,6 +89,54 @@ Size: 0 if non-present, else size of `X`.
 
 ## Packets
 
+### Game-related Packets
+
+#### `plasmid:game/player_add`
+
+Packet sent to all players of a game space when a player is joined to a game space.
+The player that was joined to the game space also receives this packet.
+
+Direction: `C<-S`
+
+| Fields         | Type       | Description                                                     |
+|:--------------:|:----------:|:----------------------------------------------------------------|
+| game_type_id   | Identifier | The identifier of the game type.                                |
+| game_type_name | Text       | The name of the game type.                                      |
+| game_id        | Identifier | The identifier of the game.                                     |
+| game_name      | Text       | The name of the game.                                           |
+| player_count   | int        | The new player count of the game space after the player joined. |
+| player_uuid    | UUID       | The UUID of the player that joined the game space.              |
+
+#### `plasmid:game/player_removed`
+
+Packet sent to all players of a game space when a player is removed from a game space.
+The player that was removed from the game space also receives this packet.
+
+Direction: `C<-S`
+
+| Fields         | Type       | Description                                                         |
+|:--------------:|:----------:|:--------------------------------------------------------------------|
+| game_type_id   | Identifier | The identifier of the game type.                                    |
+| game_type_name | Text       | The name of the game type.                                          |
+| game_id        | Identifier | The identifier of the game.                                         |
+| game_name      | Text       | The name of the game.                                               |
+| player_count   | int        | The new player count of the game space after the player is removed. |
+| player_uuid    | UUID       | The UUID of the player that was removed from the game space.        |
+
+#### `plasmid:game/game_close`
+
+Packet sent to all players in a game space when it closes.
+
+Direction: `C<-S`
+
+| Fields         | Type            | Description                        |
+|:--------------:|:---------------:|:-----------------------------------|
+| game_type_id   | Identifier      | The identifier of the game type.   |
+| game_type_name | Text            | The name of the game type.         |
+| game_id        | Identifier      | The identifier of the game.        |
+| game_name      | Text            | The name of the game.              |
+| reason         | GameCloseReason | The reason for the game's closure. |
+
 ### Workspace-related Packets
 
 The server controls most of the requests sent by a client for workspace-related packets as it requires some permissions.
