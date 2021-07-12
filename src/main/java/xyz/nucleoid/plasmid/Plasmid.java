@@ -15,6 +15,7 @@ import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import xyz.nucleoid.plasmid.command.*;
+import xyz.nucleoid.plasmid.event.GameEvents;
 import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameType;
 import xyz.nucleoid.plasmid.game.ManagedGameSpace;
@@ -27,11 +28,14 @@ import xyz.nucleoid.plasmid.game.composite.RandomGame;
 import xyz.nucleoid.plasmid.game.composite.RandomGameConfig;
 import xyz.nucleoid.plasmid.game.config.GameConfigs;
 import xyz.nucleoid.plasmid.game.event.*;
+import xyz.nucleoid.plasmid.game.stats.GameStatisticBundle;
 import xyz.nucleoid.plasmid.game.world.generator.VoidChunkGenerator;
 import xyz.nucleoid.plasmid.item.PlasmidItems;
 import xyz.nucleoid.plasmid.map.template.MapTemplateSerializer;
 import xyz.nucleoid.plasmid.map.workspace.MapWorkspaceManager;
 import xyz.nucleoid.plasmid.test.TestGame;
+
+import java.util.Map;
 
 public final class Plasmid implements ModInitializer {
     public static final String ID = "plasmid";
@@ -179,5 +183,14 @@ public final class Plasmid implements ModInitializer {
                 gameSpace.close(GameCloseReason.CANCELED);
             }
         });
+
+        // For games to debug their statistic collection without needing to setup a backend
+        if (Boolean.getBoolean("plasmid.debug_statistics")) {
+            GameEvents.CLOSING.register((gameSpace, reason) -> {
+                gameSpace.visitAllStatistics((name, bundle) -> {
+                    LOGGER.info(bundle.encodeBundle());
+                });
+            });
+        }
     }
 }

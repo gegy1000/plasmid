@@ -1,6 +1,7 @@
 {
   "game.plasmid.random": "Random Game",
   "game.plasmid.test": "Plasmid Test Game",
+  "statistic.plasmid-test-game.plasmid.test": "Plasmid Test Statistic",
   "item.plasmid.add_region": "Add Region",
   "item.plasmid.add_region.trace_mode.at_feet": "at feet mode",
   "item.plasmid.add_region.trace_mode.changed": "Changed trace mode to: %s",
@@ -132,5 +133,16 @@
   "text.plasmid.team_selection.request_team": "Request %s Team",
   "text.plasmid.team_selection.requested_team": "You have requested to join the %s",
   "text.plasmid.team_selection.suffixed_team": "%s Team",
-  "text.plasmid.test": "Test"
+  "text.plasmid.test": "Test",
+  "statistic.plasmid.games_played": "Games played",
+  "statistic.plasmid.games_won": "Games won",
+  "statistic.plasmid.games_lost": "Games lost",
+  "statistic.plasmid.total_kills": "Total kills",
+  "statistic.plasmid.deaths": "Deaths",
+  "statistic.plasmid.damage_taken": "Damage taken",
+  "statistic.plasmid.damage_dealt": "Damage dealt",
+  "statistic.plasmid.blocks_broken": "Blocks broken",
+  "statistic.plasmid.points": "Points",
+  "statistic.plasmid.time_survived": "Time survived",
+  "statistic.plasmid.ranking": "Ranking"
 }

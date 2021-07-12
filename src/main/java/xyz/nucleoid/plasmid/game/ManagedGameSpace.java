@@ -1,6 +1,8 @@
 package xyz.nucleoid.plasmid.game;
 
 import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -30,6 +32,7 @@ import xyz.nucleoid.plasmid.game.player.MutablePlayerSet;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.game.stats.GameStatisticBundle;
 import xyz.nucleoid.plasmid.util.Scheduler;
 
 import java.util.Collection;
@@ -38,6 +41,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -70,6 +74,8 @@ public final class ManagedGameSpace implements GameSpace {
     private final Authority ruleAuthority;
 
     private final ErrorReporter errorReporter;
+
+    private final Object2ObjectMap<String, GameStatisticBundle> statistics = new Object2ObjectOpenHashMap<>();
 
     private ManagedGameSpace(MinecraftServer server, BubbleWorldHandle bubble, ConfiguredGame<?> gameConfig, ConfiguredGame<?> sourceGameConfig) {
         this.bubble = bubble;
@@ -426,5 +432,19 @@ public final class ManagedGameSpace implements GameSpace {
     @Override
     public GameLifecycle getLifecycle() {
         return this.lifecycle;
+    }
+
+    @Override
+    public GameStatisticBundle getStatistics(String namespace) {
+        return this.statistics.computeIfAbsent(namespace, __ -> new GameStatisticBundle());
+    }
+
+    @Override
+    public void visitAllStatistics(BiConsumer<String, GameStatisticBundle> consumer) {
+        for (Map.Entry<String, GameStatisticBundle> entry : this.statistics.entrySet()) {
+            if (!entry.getValue().isEmpty()) {
+                consumer.accept(entry.getKey(), entry.getValue());
+            }
+        }
     }
 }

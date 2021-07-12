@@ -1,8 +1,10 @@
 package xyz.nucleoid.plasmid.test;
 
 import net.minecraft.block.Blocks;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
@@ -11,18 +13,23 @@ import net.minecraft.world.gen.chunk.ChunkGenerator;
 import org.apache.commons.lang3.mutable.MutableInt;
 import xyz.nucleoid.fantasy.BubbleWorldConfig;
 import xyz.nucleoid.fantasy.BubbleWorldSpawner;
+import xyz.nucleoid.plasmid.Plasmid;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameOpenProcedure;
 import xyz.nucleoid.plasmid.game.event.GameTickListener;
 import xyz.nucleoid.plasmid.game.event.PlayerDeathListener;
 import xyz.nucleoid.plasmid.game.rule.GameRule;
 import xyz.nucleoid.plasmid.game.rule.RuleResult;
+import xyz.nucleoid.plasmid.game.stats.GameStatisticBundle;
+import xyz.nucleoid.plasmid.game.stats.StatisticKey;
 import xyz.nucleoid.plasmid.map.template.MapTemplate;
 import xyz.nucleoid.plasmid.map.template.TemplateChunkGenerator;
 import xyz.nucleoid.plasmid.widget.GlobalWidgets;
 import xyz.nucleoid.plasmid.widget.SidebarWidget;
 
 public final class TestGame {
+    private static final StatisticKey<Double> TEST_KEY = StatisticKey.doubleKey(new Identifier(Plasmid.ID, "test"), StatisticKey.StorageType.TOTAL);
+
     public static GameOpenProcedure open(GameOpenContext<Unit> context) {
         MapTemplate template = TestGame.buildTemplate();
 
@@ -62,6 +69,11 @@ public final class TestGame {
                         content.writeLine("");
                         content.writeTranslated("text.plasmid.game.started.player", "test");
                     });
+
+                    GameStatisticBundle statistics = game.getSpace().getStatistics("plasmid-test-game");
+                    for (ServerPlayerEntity player : game.getSpace().getPlayers()) {
+                        statistics.forPlayer(player).increment(TEST_KEY, 2.5);
+                    }
                 }
             });
         });
